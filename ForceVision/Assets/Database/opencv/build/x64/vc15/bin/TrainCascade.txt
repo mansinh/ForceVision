@@ -1,6 +1,6 @@
 @ECHO OFF
 ECHO TrainingStart!
-ECHO del /S C:\Path\to\directory\C:\Users\manhk\ForceVision\Assets\Database\opencv\build\x64\vc15\bin\Cascade\*
+ECHO del /S C:\Users\manhk\ForceVision\ForceVision\Assets\Database\opencv\build\x64\vc15\bin\Cascade\*
 ECHO cd C:\Users\manhk\ForceVision\Assets\Database\opencv\build\x64\vc15\bin
 ECHO opencv_createsamples.exe -info TROOPER_Positive.txt -w 30 -h 50 -num 1000 -vec pos.vec
 ECHO opencv_traincascade.exe -data Cascade/ -vec pos.vec -bg TROOPER_Negative.txt -w 30 -h 50 -numPos 500 -numNeg 400 -numStages 9 -maxFalseAlarmRate 0.3 -minHitRate 0.9
