@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;//
 
@@ -8,8 +6,9 @@ public class GamePiece : MonoBehaviour
 {
     public enum PieceType { 
         TROOPER,
-        PROBE_DROID,
-        AT_ST
+        PROBE,
+        WALKER,
+        BASE
     }
     public PieceType type;
     [SerializeField] private BoxCollider[] boundingBoxes;

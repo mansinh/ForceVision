@@ -11,6 +11,7 @@ public class Map : ScriptableObject
     public bool[] isWalledEast;
     public bool[] isWalledWest;
     public bool[] isWalledSouth;
+    public bool[] isBlocked;
 
     public Vector3 GetCellLocalPosition(int index) 
     {

@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Events;
 
+[RequireComponent(typeof(PieceManager))]
 public class TrainingDataGenerator : MonoBehaviour {
+    [SerializeField] KeyCode generatePositiveKey = KeyCode.RightAlt;
+    [SerializeField] KeyCode generateNegativeKey = KeyCode.RightControl;
+
     [SerializeField] float deltaTime;
 
     [SerializeField] int azimuthSteps;
@@ -22,121 +23,66 @@ public class TrainingDataGenerator : MonoBehaviour {
     [SerializeField] float minLightIntensity;
     [SerializeField] float maxLightIntensity;
     [SerializeField] int lightIntensitySteps;
-
-    [SerializeField] GamePiece[] gamePiecePrefabs;
-    [SerializeField] int[] gamePieceCounts;
-    [SerializeField] Map map;
-
     [SerializeField] GamePiece.PieceType targetType;
 
     StreamWriter writer;
-    string annotationPath = "C:/Users/manhk/ForceVision/Assets/Database/opencv/build/x64/vc15/bin";
-    string positiveImagesPath = "C:/Users/manhk/ForceVision/Assets/Database/opencv/build/x64/vc15/bin/Positive";
-    string negativeImagesPath = "C:/Users/manhk/ForceVision/Assets/Database/opencv/build/x64/vc15/bin/Negative";
-    private GamePiece[] gamePieces;
-    private List<GamePiece> availableGamePieces = new List<GamePiece>();
-    private List<GamePiece> activeGamePieces = new List<GamePiece>();
-   
+    string annotationPath = "Assets/Database/opencv/build/x64/vc15/bin";
     private Light lightSource;
     private bool isGenerating = false;
-    private float pieceDensity;
     private int imageCount = 0;
+    private bool isPositive;
+    private GamePiece[] pieces;
+    //private PieceManager pieceManager;
+   
 
     private void Start() {
         lightSource = FindObjectOfType<Light>();
-        CreateGamePieces();
-        PlaceGamePieces();
+        //pieceManager = GetComponent<PieceManager>();
     }
 
-    private void CreateGamePieces() {
-        for (int i = 0; i < gamePiecePrefabs.Length; i++) {
-            for (int j = 0; j < gamePieceCounts[i]; j++) {
-                Instantiate(gamePiecePrefabs[i], transform);
-            }
-        }
-        gamePieces = FindObjectsOfType<GamePiece>();
-    }
-    private void PlaceGamePieces() {
-        foreach (GamePiece gamePiece in gamePieces) {
-            gamePiece.gameObject.SetActive(false);
-            availableGamePieces.Add(gamePiece);
-        }
-
-        ShuffleList(availableGamePieces);
-        pieceDensity = (float)availableGamePieces.Count / map.GetOccupiedCellCount();
-
-        activeGamePieces.Clear();
-        for (int i = 0; i < map.isActiveCell.Length; i++) {
-            if (availableGamePieces.Count == 0)
-                break;
-
-            if (map.isActiveCell[i]) {
-                if (UnityEngine.Random.value < pieceDensity) {
-                    GamePiece gamePiece = availableGamePieces[0];
-                    gamePiece.transform.localPosition = map.GetCellLocalPosition(i) / map.width - new Vector3(0.5f - 1 / map.width / 2, 0, 0.5f - 1 / map.width / 2);
-                    gamePiece.transform.localScale = Vector3.one;
-                    Vector3 eulerAngles = gamePiece.transform.localEulerAngles;
-                    eulerAngles.y = (int)(UnityEngine.Random.value * 4) * 90;
-                    gamePiece.transform.localEulerAngles = eulerAngles;
-                    gamePiece.gameObject.SetActive(true);
-                    activeGamePieces.Add(gamePiece);
-                    availableGamePieces.RemoveAt(0);
-                }
-            }
-        }
-    }
-    private void ShuffleList(List<GamePiece> list) {
-        for (int i = 0; i < list.Count; i++) {
-            int index = (int)(UnityEngine.Random.value * list.Count);
-            GamePiece gamePiece = list[index];
-            list.RemoveAt(index);
-            list.Insert((int)(UnityEngine.Random.value * list.Count), gamePiece);
-        }
-    }
-    bool isPositive;
     private void Update() {
-        if (Input.GetKeyDown(KeyCode.RightControl) && !isGenerating) {
+        if (Input.GetKeyDown(generatePositiveKey) && !isGenerating) {
             isPositive = true;
-            Generate();
+            StartImageGeneration();
         }
-        if (Input.GetKeyDown(KeyCode.RightAlt) && !isGenerating) {
+        if (Input.GetKeyDown(generateNegativeKey) && !isGenerating) {
             isPositive = false;
-            Generate();
-        }
-        if (Input.GetKeyDown(KeyCode.Space) && !isGenerating) {
-            PlaceGamePieces();
+            StartImageGeneration();
         }
     }
-
-   
-
-    private void Generate() {
+    private void StartImageGeneration() {
         isGenerating = true;
-
+        pieces = FindObjectsOfType<GamePiece>();
         if (!Directory.Exists(annotationPath)) {
             Directory.CreateDirectory(annotationPath);
         }
 
         if (isPositive) {
-            foreach (GamePiece gamePiece in activeGamePieces) {
-                gamePiece.gameObject.SetActive(true);
-            }
-            writer = new StreamWriter(annotationPath + "/" + targetType.ToString() + "_Positive.txt", true);
- 
-        } else {
-            foreach (GamePiece gamePiece in activeGamePieces) {
-                if (gamePiece.type == targetType) {
+            foreach (GamePiece gamePiece in pieces) {
+                if (gamePiece.type == targetType || targetType == GamePiece.PieceType.BASE) {
+                    gamePiece.gameObject.SetActive(true);
+                } else {
                     gamePiece.gameObject.SetActive(false);
                 }
             }
-            writer = new StreamWriter(annotationPath + "/"+targetType.ToString() + "_Negative.txt", true);
+            writer = new StreamWriter(annotationPath + "/" + targetType.ToString() + "_Positive.txt", true);
+
+        } else {
+            foreach (GamePiece gamePiece in pieces) {
+                if (gamePiece.type == targetType || targetType == GamePiece.PieceType.BASE) {
+                    gamePiece.gameObject.SetActive(false);
+                } else {
+                    gamePiece.gameObject.SetActive(true);
+                }
+            }
+            writer = new StreamWriter(annotationPath + "/" + targetType.ToString() + "_Negative.txt", true);
         }
- 
-        StartCoroutine(PanGen());
+
+        StartCoroutine(Generate());
     }
 
     private void PositiveData(string fileName) {
-        if (AnnotatePositive(fileName)) {
+        if (AnnotatePositive(fileName) || targetType == GamePiece.PieceType.BASE) {
             CapturePositive(fileName);
         }
     }
@@ -147,13 +93,13 @@ public class TrainingDataGenerator : MonoBehaviour {
     private void CapturePositive(string fileName) {
         imageCount++;
         Texture2D capture = Capture();
-        SaveImage(capture, fileName, positiveImagesPath);
+        SaveImage(capture, fileName, annotationPath + "/" + targetType.ToString() +"_Positive");
         Destroy(capture);
     }
     private void CaptureNegative(string fileName) {
         imageCount++;
         Texture2D capture = Capture();
-        SaveImage(capture, fileName, negativeImagesPath);
+        SaveImage(capture, fileName, annotationPath + "/" + targetType.ToString() + "_Negative");
         Destroy(capture);
     }
 
@@ -171,17 +117,17 @@ public class TrainingDataGenerator : MonoBehaviour {
     }
 
     private void AnnotateNegative(string fileName) {
-        writer.WriteLine($"Negative/{fileName}.jpg");
+        writer.WriteLine($"{targetType.ToString()}_Negative/{fileName}.jpg");
     }
 
     private bool AnnotatePositive(string fileName) {
         string line = "";
         int pieceCount = 0;
         int[] boundingRect = new int[4];
-        foreach (GamePiece gamePiece in activeGamePieces) {
+        foreach (GamePiece gamePiece in pieces) {
             if (gamePiece.CalculateBounds(out boundingRect)) {
-                if (gamePiece.type == targetType) {
-                   
+                if (gamePiece.type == targetType || targetType == GamePiece.PieceType.BASE) {
+
                     pieceCount++;
                     // record bounding rect   
                     line += " " + boundingRect[0]
@@ -195,7 +141,7 @@ public class TrainingDataGenerator : MonoBehaviour {
         if (pieceCount == 0)
             return false;
 
-        line = $"Positive/{fileName}.jpg" + "  " + pieceCount + " " + line;
+        line = $"{targetType.ToString()}_Positive/{fileName}.jpg" + "  " + pieceCount + " " + line;
 
         writer.WriteLine(line);
         return true;
@@ -210,56 +156,47 @@ public class TrainingDataGenerator : MonoBehaviour {
         return fullPath;
     }
 
-    private IEnumerator PanGen() {
+    private IEnumerator Generate() {
         imageCount = 0;
 
         float dR = (maxDistance - minDistance) / distanceSteps;
         float dAz = 2 * Mathf.PI / azimuthSteps;
         float dAl = (maxAltitude - minAltitude) / altitudeSteps;
         float dLi = (maxLightIntensity - minLightIntensity) / lightIntensitySteps;
-        for (int n = 0; n < 4; n++) {
-            for (int l = 0; l <= lightIntensitySteps; l++) {
-                for (int k = 0; k <= distanceSteps; k++) {
-                    for (int j = 0; j <= altitudeSteps; j++) {
-                        for (int i = 0; i < azimuthSteps; i++) {
-                            float az = dAz * i;
-                            float al = (dAl * j + minAltitude) * Mathf.Deg2Rad;
 
-                            float r = dR * k + minDistance;
-                            float li = dLi * l + minLightIntensity;
+        for (int l = 0; l <= lightIntensitySteps; l++) {
+            for (int k = 0; k <= distanceSteps; k++) {
+                for (int j = 0; j <= altitudeSteps; j++) {
+                    for (int i = 0; i < azimuthSteps; i++) {
+                        float az = dAz * i;
+                        float al = (dAl * j + minAltitude) * Mathf.Deg2Rad;
 
-                            float x = r * Mathf.Cos(az) * Mathf.Sin(al);
-                            float z = r * Mathf.Sin(az) * Mathf.Sin(al);
-                            float y = r * Mathf.Cos(al);
+                        float r = dR * k + minDistance;
+                        float li = maxLightIntensity - dLi * l;
 
-                            Camera.main.transform.position = new Vector3(x, y, z);
-                            Camera.main.transform.LookAt(transform.position, Vector3.up);
+                        float x = r * Mathf.Cos(az) * Mathf.Sin(al);
+                        float z = r * Mathf.Sin(az) * Mathf.Sin(al);
+                        float y = r * Mathf.Cos(al);
 
-                            lightSource.intensity = li;
-                            string fileName = targetType.ToString() + "_" +
-                                "" + imageCount + "_" + (int)(az * Mathf.Rad2Deg) + "az_" + (int)(al * Mathf.Rad2Deg) + "al_" + r + "m_" + (int)(li * 100) + "i_"+n+"n";
+                        Camera.main.transform.position = new Vector3(x, y, z);
+                        Camera.main.transform.LookAt(transform.position, Vector3.up);
 
-                            if (isPositive) {
-                                PositiveData(fileName);
-                            } else {
-                                NegativeData(fileName);
-                            }
+                        lightSource.intensity = li;
+                        string fileName = targetType.ToString() + "_" + imageCount;
 
-                            yield return new WaitForSeconds(deltaTime);
+                        if (isPositive) {
+                            PositiveData(fileName);
+                        } else {
+                            NegativeData(fileName);
                         }
+
+                        yield return new WaitForSeconds(deltaTime);
                     }
                 }
             }
-            if (isPositive) {
-                PlaceGamePieces();
-            } else {
-                break;
-            }
         }
-
         writer.Close();
         AssetDatabase.Refresh();
         isGenerating = false;
-
     }
 }
