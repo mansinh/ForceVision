@@ -13,7 +13,7 @@ public class Useable : MonoBehaviour
         }
         set {
             isOn = value;
-            Debug.Log("MOUSE DOWN USEABLE " + isOn);
+            //Debug.Log("MOUSE DOWN USEABLE " + isOn);
             meshRenderer.material  = isOn ? onMaterial : offMaterial;
         }
     }
