@@ -21,7 +21,7 @@ namespace ForceVision {
         [SerializeField] private Button terminalButton;
         [SerializeField] private Toggle lineOfSightToggle;
         [SerializeField] private Toggle movementToggle;
-        [SerializeField] private Toggle placeBlockerToggle;
+        [SerializeField] private Toggle occupiedToggle;
         [SerializeField] private AudioClip selectSound;
         [SerializeField] private FadeInOut inspectPanel;
         [SerializeField] private GameObject doorGroup;
@@ -59,6 +59,7 @@ namespace ForceVision {
                     mapDisplay.DeselectAllCells();
                 } else {
                     inspectButton.GetComponent<Image>().color = Color.white;
+                    occupiedToggle.isOn = mapDisplay.GetCell(mapDisplay.selectedCellIndex).IsOccupied;
                 }
                 isInspecting = !isInspecting;
             });
@@ -122,16 +123,21 @@ namespace ForceVision {
                 SelectSound();
                 mapDisplay.OnToggleMovement(isOn);
             });
-            placeBlockerToggle.onValueChanged.AddListener((isOn) => {
+            occupiedToggle.onValueChanged.AddListener((isOn) => {
                 SelectSound();
-                //mapDisplay.OnPlaceBlocker(isOn);
+                SetOccupied(isOn);
             });
         }
-
-        public void SetBlocker(Vector3 screenPosition, bool isBlocked) {
+        public void SetOccupied(bool isOccupied) {
+            Cell cell = mapDisplay.GetCell(mapDisplay.selectedCellIndex);
+            if (cell) {
+                cell.IsOccupied = isOccupied;
+            }
+        }
+        public void SetOccupied(Vector3 screenPosition, bool isOccupied) {
             Cell cell = mapDisplay.GetCellFromScreenPosition(screenPosition);
             if (cell) {
-                cell.IsBlocked = isBlocked;
+                cell.IsOccupied = isOccupied;
             }
         }
         public void SetSpeed(string speed) {

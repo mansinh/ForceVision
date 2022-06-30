@@ -6,7 +6,7 @@ public class PieceManager : MonoBehaviour {
     [SerializeField] KeyCode placeRandomlyKey = KeyCode.Space;
     [SerializeField] GamePiece[] gamePiecePrefabs;
     [SerializeField] int[] gamePieceCounts;
-    [SerializeField] Map map;
+    [SerializeField] MapDisplay map;
 
     private List<GamePiece> gamePieces = new List<GamePiece>();
     private List<GamePiece> availableGamePieces = new List<GamePiece>();
@@ -30,26 +30,28 @@ public class PieceManager : MonoBehaviour {
         }
 
         ShuffleList(availableGamePieces);
-        pieceDensity = (float)availableGamePieces.Count / map.GetOccupiedCellCount();
+        pieceDensity = (float)availableGamePieces.Count / (map.width*map.height);
 
         activeGamePieces.Clear();
 
-        for (int i = 0; i < map.isActiveCell.Length; i++) {
+        for (int i = 0; i < map.GetCells().Length; i++) {
             if (availableGamePieces.Count == 0)
                 break;
-
-            if (map.isActiveCell[i] && !map.isBlocked[i]) {
+            Cell cell = map.GetCell(i);
+            if (cell == null)
+                break;
+            if (cell.gameObject.activeSelf && !cell.IsBlocked) {
 
                 if (UnityEngine.Random.value < pieceDensity) {
-                    PlacePiece(map.GetCellLocalPosition(i) / map.width - new Vector3(0.5f - 1 / map.width / 2, 0, 0.5f - 1 / map.width / 2));
+                    PlacePiece(cell.transform.position);
                 }
             }
         }
     }
     private void PlacePiece(Vector3 position) {
         GamePiece gamePiece = availableGamePieces[0];
-        gamePiece.transform.localPosition = position;;
-        gamePiece.transform.localScale = Vector3.one;
+        gamePiece.transform.position = position;;
+        gamePiece.transform.localScale = 15*map.transform.localScale;
         Vector3 eulerAngles = gamePiece.transform.localEulerAngles;
         eulerAngles.y = (int)(UnityEngine.Random.value * 4) * 90;
         gamePiece.transform.localEulerAngles = eulerAngles;

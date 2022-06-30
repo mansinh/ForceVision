@@ -58,6 +58,7 @@ public class PCControls : MonoBehaviour
     }
     void MoveTableTop(float horizontal, float vertical) {
         foreach (Transform tableTop in tableTops) {
+   
             float x = tableTop.position.x;
             float z = tableTop.position.z;
             z -= vertical * speed * Time.deltaTime;
@@ -68,8 +69,9 @@ public class PCControls : MonoBehaviour
         }
     }
     void Rotation() {
+        
         foreach (Transform tableTop in tableTops) {
-            if (tableTop.gameObject.activeSelf) return;
+          
             int rotate = 0;
             if (Input.GetKey(rotateLeft)) {
                 rotate++;
@@ -77,7 +79,7 @@ public class PCControls : MonoBehaviour
             if (Input.GetKey(rotateRight)) {
                 rotate--;
             }
-
+           // Debug.Log("rotation" + Vector3.up * rotate * rotateSpeed * Time.deltaTime);
             tableTop.eulerAngles += Vector3.up * rotate * rotateSpeed * Time.deltaTime;
         }
     }

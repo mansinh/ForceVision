@@ -70,12 +70,7 @@ public class MapDisplay : MonoBehaviour {
             LineOfSight.HideAllLinesOfSight(selectedCellIndex, cells);
         }
     }
-    /*
-    public void OnPlaceBlocker(bool blocked) {
-        if (IsIndexInRange(selectedCellIndex)) {
-            cells[selectedCellIndex].IsBlocked = blocked;
-        }
-    }*/
+  
     public void ClearOccupied() {
         if (cells == null) return;
         for (int i = 0; i < cells.Length; i++) {

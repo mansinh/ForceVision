@@ -119,7 +119,7 @@ public class Cell : MonoBehaviour {
             ((CanMoveNorth() && neighbours[N].CanMoveWest()) || (CanMoveWest() && neighbours[W].CanMoveNorth()));
     }
     private bool IsNeighbourAvailable(Cell neighbour) {
-        return neighbour.isActiveAndEnabled && !neighbour.IsBlocked && !neighbour.isOccupied;
+        return neighbour.isActiveAndEnabled && !neighbour.isOccupied && !neighbour.isOccupied;
     }
     public void ShowMoveCost() {
         if (!isActiveAndEnabled) return;
