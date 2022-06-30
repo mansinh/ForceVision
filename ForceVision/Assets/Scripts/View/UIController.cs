@@ -16,7 +16,6 @@ namespace ForceVision {
         [SerializeField] private TMP_InputField speedInput;
         [SerializeField] private Button inspectButton;
         [SerializeField] private Button detectButton;
-        [SerializeField] private Button logoButton;
         [SerializeField] private Button doorButton;
         [SerializeField] private Button crateButton;
         [SerializeField] private Button terminalButton;
@@ -25,13 +24,12 @@ namespace ForceVision {
         [SerializeField] private Toggle placeBlockerToggle;
         [SerializeField] private AudioClip selectSound;
         [SerializeField] private FadeInOut inspectPanel;
-        [SerializeField] private FadeInOut aboutPanel;
         [SerializeField] private GameObject doorGroup;
         [SerializeField] private GameObject crateGroup;
         [SerializeField] private GameObject terminalGroup;
 
-        private CascadeDetector detector;
-        private MapDisplay mapDisplay;
+        [SerializeField] CascadeDetector detector;
+        [SerializeField] MapDisplay mapDisplay;
         private AudioSource audioSource;
         private bool isInspecting = false, isDetecting = false;
         private bool showingCrates = false, showingDoors = false, showingTerminals = false;
@@ -115,10 +113,7 @@ namespace ForceVision {
                 terminalButton.GetComponent<Image>().color = showingTerminals ? Color.white : offColor;
             });
 
-            logoButton.onClick.AddListener(() => {
-                SelectSound();
-                aboutPanel.ToggleFade();
-            });
+          
             lineOfSightToggle.onValueChanged.AddListener((isOn) => {
                 SelectSound();
                 mapDisplay.OnToggleLineOfSight(isOn);

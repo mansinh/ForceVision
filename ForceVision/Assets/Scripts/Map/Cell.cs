@@ -57,19 +57,18 @@ public class Cell : MonoBehaviour {
         spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = defaultSprite;
         boxCollider = GetComponent<BoxCollider>();
-        CalculateCanMove();
     }
 
     [SerializeField] List<Cell> neighbours;
     [SerializeField] List<bool> canMoveToNeighbour;
     public void SetNeighbours(List<Cell> neighbours) {
         this.neighbours = neighbours;
-        CalculateCanMove();
     }
     public List<Cell> GetNeighbours() {
         return neighbours;
     }
     public List<bool> GetCanMoveToNeighbour() {
+        CalculateCanMove();
         return canMoveToNeighbour;
     }
     public void CalculateCanMove() {
@@ -84,30 +83,38 @@ public class Cell : MonoBehaviour {
         canMoveToNeighbour.Add(CanMoveNorthWest());
     }
     public bool CanMoveNorth() {
+        if (N >= neighbours.Count) return false;
         return (neighbours[N] ? IsNeighbourAvailable(neighbours[N]) : false) && !IsWalledNorth;
     }
     public bool CanMoveEast() {
+        if (E >= neighbours.Count) return false;
         return (neighbours[E] ? IsNeighbourAvailable(neighbours[E]) : false) && !IsWalledEast;
     }
     public bool CanMoveSouth() {
+        if (S >= neighbours.Count) return false;
         return (neighbours[S] ? IsNeighbourAvailable(neighbours[S]) : false) && !IsWalledSouth;
     }
     public bool CanMoveWest() {
+        if (W >= neighbours.Count) return false;
         return (neighbours[W] ? IsNeighbourAvailable(neighbours[W]) : false) && !IsWalledWest;
     }
-    public bool CanMoveNorthEast() { 
+    public bool CanMoveNorthEast() {
+        if (NE >= neighbours.Count) return false;
         return (neighbours[NE]? IsNeighbourAvailable(neighbours[NE]):false) && 
             ((CanMoveNorth() && neighbours[N].CanMoveEast()) || (CanMoveEast() && neighbours[E].CanMoveNorth()));
     }
     public bool CanMoveSouthEast() {
+        if (SE >= neighbours.Count) return false;
         return (neighbours[SE] ? IsNeighbourAvailable(neighbours[SE]) : false) &&
             ((CanMoveSouth() && neighbours[S].CanMoveEast()) || (CanMoveEast() && neighbours[E].CanMoveSouth()));
     }
     public bool CanMoveSouthWest() {
+        if (SW >= neighbours.Count) return false;
         return (neighbours[SW] ? IsNeighbourAvailable(neighbours[SW]) : false) &&
             ((CanMoveSouth() && neighbours[S].CanMoveWest()) || (CanMoveWest() && neighbours[W].CanMoveSouth()));
     }
     public bool CanMoveNorthWest() {
+        if (NW >= neighbours.Count) return false;
         return (neighbours[NW] ? IsNeighbourAvailable(neighbours[NW]) : false) &&
             ((CanMoveNorth() && neighbours[N].CanMoveWest()) || (CanMoveWest() && neighbours[W].CanMoveNorth()));
     }

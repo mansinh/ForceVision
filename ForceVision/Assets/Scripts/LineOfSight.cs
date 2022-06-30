@@ -56,6 +56,7 @@ public static class LineOfSight
     private static void HighlightCells(int accuracy, Vector3 origin, Vector3 hitPoint)
     {
         int cellLayerMask = 1 << 6;
+        Debug.Log("distance " + (Vector3.Distance(origin, hitPoint) - 0.5f) +" "+accuracy);
         float distance = Mathf.Min(Vector3.Distance(origin, hitPoint)-0.5f, accuracy);
         RaycastHit[] hits = Physics.RaycastAll(origin, hitPoint - origin, distance, cellLayerMask);
         Debug.Log("LOS cells: "+ hits.Length +" "+ accuracy + "");

@@ -12,13 +12,13 @@ public class MapDisplay : MonoBehaviour {
     public int Speed => speed;
     public int Accuracy => accuracy;
 
-    [SerializeField] private bool reset = false, save = false;
+    [SerializeField] private bool reset = false, save = false, create = false;
     [SerializeField] private Map map;
     [SerializeField] private Cell cellPrefab;
     [SerializeField] private Cell[] cells;
     [SerializeField] private Canvas actionUI;
 
-    private int accuracy = 4, speed = 4;
+    [SerializeField] private int accuracy = 4, speed = 4;
     private BoxCollider boxCollider;
     private Vector3 origin;
  
@@ -38,6 +38,11 @@ public class MapDisplay : MonoBehaviour {
         if (save) {
             SaveMap();
             save = false;
+        }
+        if (create) {
+            ClearMap();
+            CreateMap();
+            create = false;
         }
     }
     public void Reset() {

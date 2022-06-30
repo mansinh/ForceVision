@@ -1,16 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class PCControls : MonoBehaviour
 {
     [SerializeField] float maxX, minX, maxZ, minZ;
     [SerializeField] float maxXPhoto, minXPhoto, maxYPhoto, minYPhoto;
     [SerializeField] float speed, rotateSpeed, speedPhoto;
-    [SerializeField] Transform tableTop, photo;
+    [SerializeField] Button nextMap;
+    [SerializeField] Transform[] tableTops;
+    [SerializeField] Transform photo;
     KeyCode rotateLeft = KeyCode.Q;
     KeyCode rotateRight = KeyCode.E;
-    
+    int tableTopIndex = 0;
+    private void Start() {
+        SelectTableTop();
+
+
+        nextMap.onClick.AddListener(()=> {
+            tableTopIndex++;
+            tableTopIndex = tableTopIndex % tableTops.Length;
+            SelectTableTop();
+        });
+    }
+    void SelectTableTop() {
+        for (int i = 0; i < tableTops.Length; i++) {
+            tableTops[i].gameObject.SetActive(i == tableTopIndex);
+        }
+    }
     void Update()
     {
         Translation();
@@ -40,24 +57,28 @@ public class PCControls : MonoBehaviour
         photo.localPosition = new Vector3(x, y, photo.localPosition.z);
     }
     void MoveTableTop(float horizontal, float vertical) {
-        float x = tableTop.position.x;
-        float z = tableTop.position.z;
-        z -= vertical * speed * Time.deltaTime;
-        x -= horizontal * speed * Time.deltaTime;
-        z = Mathf.Clamp(z, minZ, maxZ);
-        x = Mathf.Clamp(x, minX, maxX);
-        tableTop.position = new Vector3(x, tableTop.position.y, z);
+        foreach (Transform tableTop in tableTops) {
+            float x = tableTop.position.x;
+            float z = tableTop.position.z;
+            z -= vertical * speed * Time.deltaTime;
+            x -= horizontal * speed * Time.deltaTime;
+            z = Mathf.Clamp(z, minZ, maxZ);
+            x = Mathf.Clamp(x, minX, maxX);
+            tableTop.position = new Vector3(x, tableTop.position.y, z);
+        }
     }
     void Rotation() {
-        if (tableTop.gameObject.activeSelf) return;
-        int rotate = 0;
-        if (Input.GetKey(rotateLeft)) {
-            rotate++;
-        }
-        if (Input.GetKey(rotateRight)) {
-            rotate--;
-        }
+        foreach (Transform tableTop in tableTops) {
+            if (tableTop.gameObject.activeSelf) return;
+            int rotate = 0;
+            if (Input.GetKey(rotateLeft)) {
+                rotate++;
+            }
+            if (Input.GetKey(rotateRight)) {
+                rotate--;
+            }
 
-        tableTop.eulerAngles += Vector3.up * rotate * rotateSpeed * Time.deltaTime;
+            tableTop.eulerAngles += Vector3.up * rotate * rotateSpeed * Time.deltaTime;
+        }
     }
 }
