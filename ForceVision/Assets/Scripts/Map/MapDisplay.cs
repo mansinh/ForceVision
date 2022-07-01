@@ -200,13 +200,20 @@ public class MapDisplay : MonoBehaviour {
         DeselectAllCells();
         Vector3 worldPosition;
         bool hasHit = ScreenToWorldPosition(screenPosition, out worldPosition);
-        if (hasHit) {
+        if (hasHit)
+        {
             int index = PositionToIndex(worldPosition);
+
             if (OnCellSelected(index)) {
-                selectedCellIndex = index;
+           
+            selectedCellIndex = index;
+
             } else {
-                selectedCellIndex = -1;
+            selectedCellIndex = -1;
             }
+        }
+        else {
+            selectedCellIndex = -1;
         }
     }
     public void DeselectCell() {
@@ -216,18 +223,10 @@ public class MapDisplay : MonoBehaviour {
         DeselectAllCells();
     }
     private bool OnCellSelected(int index) {
-        if (index < 0) return false;
+        if (!IsIndexInRange(index)) return false;
         if (!cells[index].isActiveAndEnabled) return false;
-
-        selectedCellIndex = index;
-        if (cells[index].OnClicked()) {
-            if (isShowingLineOfSight)
-                LineOfSight.ShowAllLinesOfSight((int)(accuracy*transform.localScale.x), selectedCellIndex, (int)width, cells);
-            if (isShowingMovement)
-                Movement.ShowAllMovementCost(speed, selectedCellIndex, cells);
-            return true;
-        }
-        return false;
+        cells[index].OnSelect();
+        return true;
     }
    
     public void DeselectAllCells() {

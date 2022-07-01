@@ -59,7 +59,7 @@ public static class LineOfSight
         Debug.Log("distance " + (Vector3.Distance(origin, hitPoint) - 0.5f) +" "+accuracy);
         float distance = Mathf.Min(Vector3.Distance(origin, hitPoint)-0.5f, accuracy);
         RaycastHit[] hits = Physics.RaycastAll(origin, hitPoint - origin, distance, cellLayerMask);
-        Debug.Log("LOS cells: "+ hits.Length +" "+ accuracy + "");
+        Debug.Log("LOS cells: "+ hits.Length +" "+ accuracy + "" +distance);
         foreach (RaycastHit h in hits)
         {
             Cell cellHit = h.collider.gameObject.GetComponent<Cell>();

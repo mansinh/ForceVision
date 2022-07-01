@@ -8,9 +8,11 @@ using OpenCVForUnity.ImgprocModule;
 using OpenCVForUnity.ObjdetectModule;
 using OpenCVForUnity.UnityUtils;
 
-namespace ForceVision {
+namespace ForceVision
+{
     [RequireComponent(typeof(AudioSource))]
-    public class UIController : MonoBehaviour {
+    public class UIController : MonoBehaviour
+    {
 
         [SerializeField] private TMP_InputField accuracyInput;
         [SerializeField] private TMP_InputField speedInput;
@@ -35,7 +37,8 @@ namespace ForceVision {
         private bool showingCrates = false, showingDoors = false, showingTerminals = false;
         private Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);
         private Color offColor = new Color(1, 1, 1, 0.2f);
-        void Start() {
+        void Start()
+        {
             mapDisplay = FindObjectOfType<MapDisplay>();
             detector = FindObjectOfType<CascadeDetector>();
             audioSource = GetComponent<AudioSource>();
@@ -49,36 +52,46 @@ namespace ForceVision {
             InitializeButtons();
         }
 
-        private void InitializeButtons() {
+        private void InitializeButtons()
+        {
             inspectButton.onClick.AddListener(() => {
-                if (!mapDisplay.IsCellSelected()) return;
-            SelectSound();
-            inspectPanel.ToggleFade();
-                if (isInspecting) {
+      
+                SelectSound();
+                inspectPanel.ToggleFade();
+                if (isInspecting)
+                {
                     inspectButton.GetComponent<Image>().color = offColor;
                     mapDisplay.DeselectAllCells();
-                } else {
+                }
+                else
+                {
                     inspectButton.GetComponent<Image>().color = Color.white;
-                    occupiedToggle.isOn = mapDisplay.GetCell(mapDisplay.selectedCellIndex).IsOccupied;
+
+                    if (mapDisplay.IsCellSelected())
+                        occupiedToggle.isOn = mapDisplay.GetCell(mapDisplay.selectedCellIndex).IsOccupied;
                 }
                 isInspecting = !isInspecting;
             });
             detectButton.GetComponent<Image>().color = offColor;
             detectButton.onClick.AddListener(() => {
                 SelectSound();
-                if (isDetecting) {
+                if (isDetecting)
+                {
                     detectButton.GetComponent<Image>().color = offColor;
                     mapDisplay.ClearOccupied();
-                } else {
+                }
+                else
+                {
                     detectButton.GetComponent<Image>().color = Color.white;
                     detector.Detect();
                     Debug.Log("detect");
-                    foreach (OpenCVForUnity.CoreModule.Rect detected in detector.detectedRects) {
+                    foreach (OpenCVForUnity.CoreModule.Rect detected in detector.detectedRects)
+                    {
                         Debug.Log("box");
 
                         Vector2 screenPosition = new Vector2(detected.x + (float)detected.size().width / 2, Screen.height - detected.y - (float)detected.size().height / 2);//new Vector2(detected.x+detected.width/2, Screen.height-detected.y-detected.height/2);
-                        Debug.Log(screenPosition);
-
+                        Debug.Log("DETECT"+screenPosition);
+                        Debug.Log(detected.size().height + " " + detected.size().width);
                         Cell cell = mapDisplay.GetCellFromScreenPosition(screenPosition);
                         if (cell)
                             cell.IsOccupied = true;
@@ -114,7 +127,7 @@ namespace ForceVision {
                 terminalButton.GetComponent<Image>().color = showingTerminals ? Color.white : offColor;
             });
 
-          
+
             lineOfSightToggle.onValueChanged.AddListener((isOn) => {
                 SelectSound();
                 mapDisplay.OnToggleLineOfSight(isOn);
@@ -128,33 +141,41 @@ namespace ForceVision {
                 SetOccupied(isOn);
             });
         }
-        public void SetOccupied(bool isOccupied) {
+        public void SetOccupied(bool isOccupied)
+        {
             Cell cell = mapDisplay.GetCell(mapDisplay.selectedCellIndex);
-            if (cell) {
+            if (cell)
+            {
                 cell.IsOccupied = isOccupied;
             }
         }
-        public void SetOccupied(Vector3 screenPosition, bool isOccupied) {
+        public void SetOccupied(Vector3 screenPosition, bool isOccupied)
+        {
             Cell cell = mapDisplay.GetCellFromScreenPosition(screenPosition);
-            if (cell) {
+            if (cell)
+            {
                 cell.IsOccupied = isOccupied;
             }
         }
-        public void SetSpeed(string speed) {
+        public void SetSpeed(string speed)
+        {
             mapDisplay.SetAccuracy(speed);
         }
-        public void SetAccuracy(string accuracy) {
+        public void SetAccuracy(string accuracy)
+        {
             mapDisplay.SetAccuracy(accuracy);
         }
-        private void SelectSound() {
+        private void SelectSound()
+        {
             if (selectSound)
                 audioSource.PlayOneShot(selectSound);
         }
-        private void Update() {
+        private void Update()
+        {
             //Debug.Log(Input.mousePosition);
-            if(!isInspecting)
+            if (!isInspecting)
                 mapDisplay.SelectCellFromScreenPosition(screenCenter);
-            
+
         }
     }
 }

@@ -7,6 +7,7 @@ public class PhotoController : MonoBehaviour {
     [SerializeField] Button previous, next;
     [SerializeField] Image photo;
     [SerializeField] Sprite[] photos;
+
    
     int index = 0;
     void Start() {
