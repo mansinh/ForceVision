@@ -196,7 +196,7 @@ public class TrainingDataGenerator : MonoBehaviour {
             }
         }
         writer.Close();
-        AssetDatabase.Refresh();
+        //AssetDatabase.Refresh();
         isGenerating = false;
     }
 }

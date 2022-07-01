@@ -7,9 +7,14 @@ public class AlignWithView : MonoBehaviour
 {
     private void Update()
     {
+#if UNITY_EDITOR
+
         SceneView sceneView = SceneView.lastActiveSceneView;
         if (sceneView == null) return;
         transform.position = sceneView.camera.transform.position;
         transform.rotation = sceneView.camera.transform.rotation;
+
+
+#endif
     }
 }
