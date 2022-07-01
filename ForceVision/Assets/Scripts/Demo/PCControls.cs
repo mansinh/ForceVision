@@ -34,7 +34,7 @@ public class PCControls : MonoBehaviour
         Rotation();
         if (Input.GetKeyDown(KeyCode.Space)) {
             Debug.Log("space");
-            photo.gameObject.SetActive(!photo.gameObject.activeSelf);
+            //photo.gameObject.SetActive(!photo.gameObject.activeSelf);
         }
     }
     void Translation() {
